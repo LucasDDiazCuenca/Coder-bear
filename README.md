@@ -65,3 +65,15 @@ Welcome to the Coder Bear development guidelines! These guidelines are designed 
     - Describe the committed changes using verb+complements format (e.g., "Add new home button").
 3. **Commit Size**:
     - Make small, focused commits corresponding to individual tasks or smaller changes.
+
+## Credits & personal portfolios
+
+Big thanks to all contributors ❤️❤️
+
+**Lucas Diaz** ✨:
+
+https://www.lucasdiaz.xyz/
+
+**Flors Rueda** ✨:
+
+https://flors.rucev.com/
