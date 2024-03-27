@@ -1,5 +1,7 @@
 /* Class Constructor Validator */
 
+import { MISSIONS } from "./constants";
+
 /**TODO: documentate */
 
 type Missions = { [key: string]: boolean };
@@ -52,5 +54,18 @@ export default class Game {
     updateHunger(value: number): void {
         if (0 <= this.hunger + value && this.hunger + value <= 100) this.hunger = this.hunger + value
         else this.hunger = 0 > this.hunger + value ? 0 : 100
+    }
+
+    updateMissions(mission: string): void {
+        if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw Error('Invalid operation. Mission does not exist.');
+        if (this.missions[mission] === true) throw Error('Invalid operation. Mission is already complete.');
+
+        if (this.missions[mission] === false) {
+            this.missions[mission] = true;
+            const reward: any = MISSIONS.find(_mission => _mission.id === mission)?.reward;
+            reward.type === 'money' ? this.updateMoney(reward.value) : this.updateHappiness(reward.value);
+        } else {
+            this.missions[mission] = false;
+        }
     }
 }
