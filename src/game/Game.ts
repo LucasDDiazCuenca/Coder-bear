@@ -22,6 +22,7 @@ export default class Game {
     hunger: number;
     missions: Missions;
     enhancements: Enhancements;
+    /*Add per second update values*/
 
     constructor(
         money: number = 50,
