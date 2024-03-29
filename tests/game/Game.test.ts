@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from "@testing-library/react";
 import Game from '../../src/game/Game';
 import { getRandomMissionId } from './helpers';
-import { MISSIONS } from '../../src/game/constants';
+import { MISSIONS, startingUpdateValues } from '../../src/game/constants';
 
 describe('Initialize Game', () => {
    afterEach(cleanup);
@@ -14,15 +14,27 @@ describe('Initialize Game', () => {
       expect(game.hunger).toBe(100);
       expect(game.missions).toStrictEqual({});
       expect(game.enhancements).toStrictEqual({});
+      expect(game.recoverHunger).toBe(startingUpdateValues['recover-hunger']);
+      expect(game.loseHunger).toBe(startingUpdateValues['lose-hunger']);
+      expect(game.recoverHappiness).toBe(startingUpdateValues['recover-happiness']);
+      expect(game.loseHappiness).toBe(startingUpdateValues['lose-happiness']);
+      expect(game.clickMoney).toBe(startingUpdateValues['click-money']);
+      expect(game.idleMoney).toBe(startingUpdateValues['idle-money']);
    });
 
    it('initializes with correct transfered properties a previous Game', () => {
-      const game: Game = new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true });
+      const game: Game = new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 10, 0.1, 8, 12);
       expect(game.money).toBe(10);
       expect(game.happiness).toBe(10);
       expect(game.hunger).toBe(50);
       expect(game.missions).toStrictEqual({ '001': true, '002': false });
       expect(game.enhancements).toStrictEqual({ '001': true, '002': true });
+      expect(game.recoverHunger).toBe(6);
+      expect(game.loseHunger).toBe(0.8);
+      expect(game.recoverHappiness).toBe(10);
+      expect(game.loseHappiness).toBe(0.1);
+      expect(game.clickMoney).toBe(8);
+      expect(game.idleMoney).toBe(12);
    });
 
    it('fails with incorrect money value (<0)', () => {
@@ -52,6 +64,66 @@ describe('Initialize Game', () => {
    it('fails with incorrect hunger value (>100)', () => {
       expect(() => new Game(10, 50, 150, { '001': true, '002': false }, { '001': true, '002': true })).toThrowError(
          /^Invalid arguments. Argument 'hunger' should be between 0 and 100.$/,
+      )
+   });
+
+   it('fails with incorrect recover-hunger value (<Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 0.01, 0.8, 10, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'recover-hunger' should be equal or higher than starting value.$/,
+      )
+   });
+
+   it('fails with incorrect recover-hunger value (>Max)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 106, 0.8, 10, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'recover-hunger' should be equal or lower than max value.$/,
+      )
+   });
+
+   it('fails with incorrect lose-hunger value (>Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 8, 10, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'lose-hunger' should be equal or lower starting value.$/,
+      )
+   });
+
+   it('fails with incorrect lose-hunger value (<Max)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0, 10, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'lose-hunger' should be equal or higher than max value.$/,
+      )
+   });
+
+   it('fails with incorrect recover-happiness value (<Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 1, 0.8, 1, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'recover-happiness' should be equal or higher than starting value.$/,
+      )
+   });
+
+   it('fails with incorrect recover-happiness value (>Max)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 110, 0.1, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'recover-happiness' should be equal or lower than max value.$/,
+      )
+   });
+
+   it('fails with incorrect lose-happiness value (>Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 10, 10, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'lose-happiness' should be equal or lower starting value.$/,
+      )
+   });
+
+   it('fails with incorrect lose-happiness value (<Max)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 10, 0, 8, 12)).toThrowError(
+         /^Invalid arguments. Argument 'lose-happiness' should be equal or higher than max value.$/,
+      )
+   });
+
+   it('fails with incorrect click-money value (<Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 8, 0.18, 0, 12)).toThrowError(
+         /^Invalid arguments. Argument 'click-money' should be equal or higher starting value.$/,
+      )
+   });
+
+   it('fails with incorrect idle-money value (<Start)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, { '001': true, '002': true }, 6, 0.8, 8, 0.18, 10, -12)).toThrowError(
+         /^Invalid arguments. Argument 'idle-money' should be equal or higher starting value.$/,
       )
    });
 });

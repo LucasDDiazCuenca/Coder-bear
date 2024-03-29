@@ -1,6 +1,6 @@
 /* Class Constructor Validator */
 
-import { MISSIONS } from "./constants";
+import { MISSIONS, maxUpdateValues, startingUpdateValues } from "./constants";
 
 /**TODO: documentate */
 
@@ -13,6 +13,17 @@ const validateAttribute = (attr: string, value: any): void => {
         if (attr === 'money' && value < 0) throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher than 0.`);
         if ((attr === 'happiness' || attr === 'hunger') && (value < 0 || value > 100)) throw new Error(`${msgIntro} Argument '${attr}' should be between 0 and 100.`);
     }
+    if ((attr === 'click-money' || attr === 'idle-money') && (value < startingUpdateValues[attr])) {
+        throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher starting value.`);
+    }
+    if (attr.includes('recover')) {
+        if (value < startingUpdateValues[attr]) throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher than starting value.`)
+        if (value > maxUpdateValues[attr]) throw new Error(`${msgIntro} Argument '${attr}' should be equal or lower than max value.`)
+    }
+    if (attr.includes('lose')) {
+        if (value > startingUpdateValues[attr]) throw new Error(`${msgIntro} Argument '${attr}' should be equal or lower starting value.`)
+        if (value < maxUpdateValues[attr]) throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher than max value.`)
+    }
 }
 
 /* Add class documentation */
@@ -22,24 +33,48 @@ export default class Game {
     hunger: number;
     missions: Missions;
     enhancements: Enhancements;
-    /*Add per second update values*/
+    recoverHunger: number;
+    loseHunger: number;
+    recoverHappiness: number;
+    loseHappiness: number;
+    clickMoney: number;
+    idleMoney: number;
 
     constructor(
         money: number = 50,
         happiness: number = 90,
         hunger: number = 100,
         missions: Missions | {} = {},
-        enhancements: Enhancements | {} = {}
+        enhancements: Enhancements | {} = {},
+        recoverHunger: number = startingUpdateValues['recover-hunger'],
+        loseHunger: number = startingUpdateValues['lose-hunger'],
+        recoverHappiness: number = startingUpdateValues['recover-happiness'],
+        loseHappiness: number = startingUpdateValues['lose-happiness'],
+        clickMoney: number = startingUpdateValues['click-money'],
+        idleMoney: number = startingUpdateValues['idle-money'],
+
     ) {
         validateAttribute('money', money);
         validateAttribute('happiness', happiness);
         validateAttribute('hunger', hunger);
+        validateAttribute('recover-hunger', recoverHunger);
+        validateAttribute('lose-hunger', loseHunger);
+        validateAttribute('recover-happiness', recoverHappiness);
+        validateAttribute('lose-happiness', loseHappiness);
+        validateAttribute('click-money', clickMoney);
+        validateAttribute('idle-money', idleMoney);
 
         this.money = money;
         this.happiness = happiness;
         this.hunger = hunger;
         this.missions = missions;
         this.enhancements = enhancements;
+        this.recoverHunger = recoverHunger;
+        this.loseHunger = loseHunger;
+        this.recoverHappiness = recoverHappiness;
+        this.loseHappiness = loseHappiness;
+        this.clickMoney = clickMoney;
+        this.idleMoney = idleMoney;
     }
 
     updateMoney(value: number): void {
