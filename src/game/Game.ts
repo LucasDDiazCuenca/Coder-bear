@@ -1,11 +1,10 @@
 /* Class Constructor Validator */
 
-import { MISSIONS, maxUpdateValues, startingUpdateValues } from "./constants";
+import { ENHANCEMENTS, MISSIONS, maxUpdateValues, startingUpdateValues } from "./constants";
 
 /**TODO: documentate */
 
 type Missions = { [key: string]: boolean };
-type Enhancements = { [key: string]: boolean };
 
 const validateAttribute = (attr: string, value: any): void => {
     const msgIntro = 'Invalid arguments.';
@@ -32,7 +31,7 @@ export default class Game {
     happiness: number;
     hunger: number;
     missions: Missions;
-    enhancements: Enhancements;
+    enhancements: Array<String>;
     recoverHunger: number;
     loseHunger: number;
     recoverHappiness: number;
@@ -45,7 +44,7 @@ export default class Game {
         happiness: number = 90,
         hunger: number = 100,
         missions: Missions | {} = {},
-        enhancements: Enhancements | {} = {},
+        enhancements: Array<String> | [] = [],
         recoverHunger: number = startingUpdateValues['recover-hunger'],
         loseHunger: number = startingUpdateValues['lose-hunger'],
         recoverHappiness: number = startingUpdateValues['recover-happiness'],
@@ -78,7 +77,7 @@ export default class Game {
     }
 
     updateMoney(value: number): void {
-        if (this.money + value < 0) throw Error('Invalid operation. Money can not be less than 0.');
+        if (this.money + value < 0) throw new Error('Invalid operation. Money can not be less than 0.');
         this.money = this.money + value;
     }
 
@@ -92,6 +91,46 @@ export default class Game {
         else this.hunger = 0 > this.hunger + value ? 0 : 100
     }
 
+    updateRecoverHunger(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+        if (this.recoverHunger + value > maxUpdateValues['recover-hunger']) throw new Error('Invalid operation. Value will overpass max.');
+
+        this.recoverHunger += value;
+    }
+
+    updateLoseHunger(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+        if (this.loseHunger - value < maxUpdateValues['lose-hunger']) throw new Error('Invalid operation. Value will overpass max.');
+
+        this.loseHunger -= value;
+    }
+
+    updateRecoverHappiness(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+        if (this.recoverHappiness + value > maxUpdateValues['recover-happiness']) throw new Error('Invalid operation. Value will overpass max.');
+
+        this.recoverHappiness += value;
+    }
+
+    updateLoseHappiness(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+        if (this.loseHappiness - value < maxUpdateValues['lose-happiness']) throw new Error('Invalid operation. Value will overpass max.');
+
+        this.loseHappiness -= value;
+    }
+
+    updateClickMoney(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+
+        this.clickMoney += value;
+    }
+
+    updateIdleMoney(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+
+        this.idleMoney += value;
+    }
+
     updateMissions(mission: string): void {
         if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw Error('Invalid operation. Mission does not exist.');
         if (this.missions[mission] === true) throw Error('Invalid operation. Mission is already complete.');
@@ -103,5 +142,34 @@ export default class Game {
         } else {
             this.missions[mission] = false;
         }
+    }
+
+    updateEnhancements(enhancement: string): void {
+        if ((ENHANCEMENTS.map(({ id }) => id)).includes(enhancement) === false) throw new Error('Invalid operation. Enhancement does not exist.');
+        if (this.enhancements.includes(enhancement)) throw new Error('Invalid operation. Enhancement is already unlocked.');
+
+        const effect: any = ENHANCEMENTS.find(_enhancement => _enhancement.id === enhancement)?.effect;
+        switch (effect.type) {
+            case 'recover-hunger':
+                this.updateRecoverHunger(effect.value)
+                break;
+            case 'lose-hunger':
+                this.updateLoseHunger(effect.value)
+                break;
+            case 'recover-happiness':
+                this.updateRecoverHappiness(effect.value)
+                break;
+            case 'lose-happiness':
+                this.updateLoseHappiness(effect.value)
+                break;
+            case 'click-money':
+                this.updateClickMoney(effect.value)
+                break;
+            case 'idle-money':
+                this.updateIdleMoney(effect.value)
+                break;
+        }
+
+        this.enhancements.push(enhancement)
     }
 }
