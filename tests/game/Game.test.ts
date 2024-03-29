@@ -418,6 +418,65 @@ describe('Update Game Missions', () => {
       )
    });
 
+
+   it('fails when trying to start a new mission while on another one', () => {
+      const randomMission: string = getRandomMissionId();
+      let randomMission2: string = getRandomMissionId();
+      while (randomMission2 === randomMission) {
+         randomMission2 = getRandomMissionId()
+      }
+      const game: Game = new Game(90, 90, 50, { [randomMission]: false }, []);
+
+      expect(() => game.updateMissions(randomMission2)).toThrowError(
+         /^Invalid operation. Another mission is already active.$/,
+      )
+
+   });
+
+   it('fails when trying to update a mission that does not exist', () => {
+      const game: Game = new Game(90, 90, 50, {}, []);
+
+      expect(() => game.updateMissions('NOT A REAL MISSION ID')).toThrowError(
+         /^Invalid operation. Mission does not exist.$/,
+      )
+   });
+});
+
+describe('Update Game Mission', () => {
+   afterEach(cleanup);
+
+   it('deletes correct mission in progress', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(90, 90, 50, { [randomMission]: false });
+
+      game.deleteMission(randomMission);
+
+      const expectedMissions: object = {};
+
+      expect(game.missions).toStrictEqual(expectedMissions);
+   });
+
+   it('fails when trying to delete a complete mission', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(90, 90, 50, { [randomMission]: true }, []);
+
+      expect(() => game.deleteMission(randomMission)).toThrowError(
+         /^Invalid operation. Mission is already complete.$/,
+      )
+   });
+
+
+   it('fails when trying to delete a not started mission', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game();
+
+      expect(() => game.deleteMission(randomMission)).toThrowError(
+         /^Invalid operation. Mission is not active.$/,
+      )
+
+
+   });
+
    it('fails when trying to update a mission that does not exist', () => {
       const game: Game = new Game(90, 90, 50, {}, []);
 

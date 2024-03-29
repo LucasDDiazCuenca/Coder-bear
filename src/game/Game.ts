@@ -132,8 +132,9 @@ export default class Game {
     }
 
     updateMissions(mission: string): void {
-        if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw Error('Invalid operation. Mission does not exist.');
-        if (this.missions[mission] === true) throw Error('Invalid operation. Mission is already complete.');
+        if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw new Error('Invalid operation. Mission does not exist.');
+        if (Object.values(this.missions).some(complete => !complete) && this.missions[mission] === undefined) throw new Error('Invalid operation. Another mission is already active.');
+        if (this.missions[mission] === true) throw new Error('Invalid operation. Mission is already complete.');
 
         if (this.missions[mission] === false) {
             this.missions[mission] = true;
@@ -142,6 +143,14 @@ export default class Game {
         } else {
             this.missions[mission] = false;
         }
+    }
+
+    deleteMission(mission: string): void {
+        if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw new Error('Invalid operation. Mission does not exist.');
+        if (this.missions[mission] === undefined) throw new Error('Invalid operation. Mission is not active.');
+        if (this.missions[mission] === true) throw new Error('Invalid operation. Mission is already complete.');
+
+        delete this.missions[mission]
     }
 
     updateEnhancements(enhancement: string): void {
