@@ -1,9 +1,10 @@
 /*TODO: Add documentation, check tests for guideline*/
-export const MISSIONS: { id: string, name: string, description: string, reward: { type: string, value: number } }[] = [
+export const MISSIONS: { id: string, name: string, description: string, objective: number, reward: { type: string, value: number } }[] = [
     {
         id: "T001",
         name: "Tutorial",
         description: "Welcome to the game, let's see how do you play",
+        objective: 20,
         reward: {
             type: "happiness",
             value: 10
@@ -13,9 +14,10 @@ export const MISSIONS: { id: string, name: string, description: string, reward: 
         id: "T002",
         name: "First job",
         description: "You may be new, but any client expects the best!",
+        objective: 120,
         reward: {
             type: "money",
-            value: 20
+            value: 500
         }
     },
 ];
@@ -44,7 +46,7 @@ export const ENHANCEMENTS: { id: string, name: string, description: string, effe
         name: "New Computer",
         description: "Work better, earn more",
         effect: {
-            type: "click-money",
+            type: "idle-money",
             value: 5
         }
     },

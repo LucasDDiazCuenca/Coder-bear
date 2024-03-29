@@ -6,6 +6,11 @@ export const getRandomMissionId = (): string => {
     return MISSIONS[index].id;
 }
 
+export const getRandomEnhancementId = (): string => {
+    const index: number = Math.floor(Math.random() * ENHANCEMENTS.length);
+    return ENHANCEMENTS[index].id;
+}
+
 export const areIdsUnique = (array: any[]): boolean => {
     const encounteredValues = new Set<any>();
 
@@ -35,6 +40,18 @@ export const areAllNamesWritten = (array: any[]): boolean => {
     for (const obj of array) {
         const description = obj['name'];
         if (description.trim() === '') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export const areMissionObjectiveValid = (): boolean => {
+
+    for (const mission of MISSIONS) {
+        ;
+        if (typeof mission.objective !== 'number' || mission.objective <= 0) {
             return false;
         }
     }
