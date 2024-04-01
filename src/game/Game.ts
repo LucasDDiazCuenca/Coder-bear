@@ -8,8 +8,8 @@ type Missions = { [key: string]: boolean };
 
 const validateAttribute = (attr: string, value: any): void => {
     const msgIntro = 'Invalid arguments.';
-    if (attr === 'money' || attr === 'happiness' || attr === 'hunger') {
-        if (attr === 'money' && value < 0) throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher than 0.`);
+    if (attr === 'money' || attr === 'happiness' || attr === 'hunger' || attr === 'mission-progress') {
+        if ((attr === 'money' || attr === 'mission-progress') && value < 0) throw new Error(`${msgIntro} Argument '${attr}' should be equal or higher than 0.`);
         if ((attr === 'happiness' || attr === 'hunger') && (value < 0 || value > 100)) throw new Error(`${msgIntro} Argument '${attr}' should be between 0 and 100.`);
     }
     if ((attr === 'click-money' || attr === 'idle-money') && (value < startingUpdateValues[attr])) {
@@ -38,6 +38,7 @@ export default class Game {
     loseHappiness: number;
     clickMoney: number;
     idleMoney: number;
+    missionProgress: number;
 
     constructor(
         money: number = 50,
@@ -51,6 +52,7 @@ export default class Game {
         loseHappiness: number = startingUpdateValues['lose-happiness'],
         clickMoney: number = startingUpdateValues['click-money'],
         idleMoney: number = startingUpdateValues['idle-money'],
+        missionProgress: number = 0,
 
     ) {
         validateAttribute('money', money);
@@ -62,6 +64,7 @@ export default class Game {
         validateAttribute('lose-happiness', loseHappiness);
         validateAttribute('click-money', clickMoney);
         validateAttribute('idle-money', idleMoney);
+        validateAttribute('mission-progress', missionProgress);
 
         this.money = money;
         this.happiness = happiness;
@@ -74,6 +77,7 @@ export default class Game {
         this.loseHappiness = loseHappiness;
         this.clickMoney = clickMoney;
         this.idleMoney = idleMoney;
+        this.missionProgress = missionProgress
     }
 
     updateMoney(value: number): void {
@@ -138,6 +142,7 @@ export default class Game {
 
         if (this.missions[mission] === false) {
             this.missions[mission] = true;
+            this.missionProgress = 0;
             const reward: any = MISSIONS.find(_mission => _mission.id === mission)?.reward;
             reward.type === 'money' ? this.updateMoney(reward.value) : this.updateHappiness(reward.value);
         } else {
@@ -151,6 +156,13 @@ export default class Game {
         if (this.missions[mission] === true) throw new Error('Invalid operation. Mission is already complete.');
 
         delete this.missions[mission]
+        this.missionProgress = 0;
+    }
+
+    updateMissionProgress(value: number): void {
+        if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
+
+        this.missionProgress += value;
     }
 
     updateEnhancements(enhancement: string): void {

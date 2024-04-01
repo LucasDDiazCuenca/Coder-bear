@@ -20,10 +20,11 @@ describe('Initialize Game', () => {
       expect(game.loseHappiness).toBe(startingUpdateValues['lose-happiness']);
       expect(game.clickMoney).toBe(startingUpdateValues['click-money']);
       expect(game.idleMoney).toBe(startingUpdateValues['idle-money']);
+      expect(game.missionProgress).toBe(0);
    });
 
    it('initializes with correct transfered properties a previous Game', () => {
-      const game: Game = new Game(10, 10, 50, { '001': true, '002': false }, ['001'], 6, 0.8, 10, 0.1, 8, 12);
+      const game: Game = new Game(10, 10, 50, { '001': true, '002': false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
       expect(game.money).toBe(10);
       expect(game.happiness).toBe(10);
       expect(game.hunger).toBe(50);
@@ -35,11 +36,18 @@ describe('Initialize Game', () => {
       expect(game.loseHappiness).toBe(0.1);
       expect(game.clickMoney).toBe(8);
       expect(game.idleMoney).toBe(12);
+      expect(game.missionProgress).toBe(15)
    });
 
    it('fails with incorrect money value (<0)', () => {
       expect(() => new Game(-10, 50, 50)).toThrowError(
          /^Invalid arguments. Argument 'money' should be equal or higher than 0.$/,
+      )
+   });
+
+   it('fails with incorrect mission progress value (<0)', () => {
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, -15)).toThrowError(
+         /^Invalid arguments. Argument 'mission-progress' should be equal or higher than 0.$/,
       )
    });
 
@@ -407,6 +415,7 @@ describe('Update Game Missions', () => {
       expect(game.missions).toStrictEqual(expectedMissions);
       expect(game.money).toBe(updatedMoney);
       expect(game.happiness).toBe(updatedHappiness);
+      expect(game.missionProgress).toBe(0);
    });
 
    it('fails when trying to update a complete mission', () => {
@@ -442,18 +451,19 @@ describe('Update Game Missions', () => {
    });
 });
 
-describe('Update Game Mission', () => {
+describe('Delete Game Mission', () => {
    afterEach(cleanup);
 
    it('deletes correct mission in progress', () => {
       const randomMission: string = getRandomMissionId();
-      const game: Game = new Game(90, 90, 50, { [randomMission]: false });
+      const game: Game = new Game(10, 10, 50, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
 
       game.deleteMission(randomMission);
 
       const expectedMissions: object = {};
 
       expect(game.missions).toStrictEqual(expectedMissions);
+      expect(game.missionProgress).toBe(0)
    });
 
    it('fails when trying to delete a complete mission', () => {
