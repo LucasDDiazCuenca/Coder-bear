@@ -670,3 +670,88 @@ describe('Game On Idle', () => {
       expect(game.happiness).toBe(10 + game.recoverHappiness);
    });
 });
+
+describe('Get Game Data', () => {
+   afterEach(cleanup);
+
+   it('retrieve game data needed to create or save the current Game', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const gameData = game.getGameData();
+
+      expect(gameData['money']).toBe(game.money);
+      expect(gameData['happiness']).toBe(game.happiness);
+      expect(gameData['hunger']).toBe(game.hunger);
+      expect(gameData['missions']).toStrictEqual(game.missions);
+      expect(gameData['enhancements']).toStrictEqual(game.enhancements);
+      expect(gameData['recoverHunger']).toBe(game.recoverHunger);
+      expect(gameData['loseHunger']).toBe(game.loseHunger);
+      expect(gameData['recoverHappiness']).toBe(game.recoverHappiness);
+      expect(gameData['loseHappiness']).toBe(game.loseHappiness);
+      expect(gameData['clickMoney']).toBe(game.clickMoney);
+      expect(gameData['idleMoney']).toBe(game.idleMoney);
+      expect(gameData['missionProgress']).toBe(game.missionProgress)
+   });
+
+   it('retrieve game stats (hunger, happy, money)', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const gameStats = game.getGameStats();
+
+      expect(gameStats['money']).toBe(game.money);
+      expect(gameStats['happiness']).toBe(game.happiness);
+      expect(gameStats['hunger']).toBe(game.hunger);
+   });
+
+   it('retrieve game update values (recoverHunger, loseHunger, recoverHappiness, loseHappiness, clickMoney, idleMoney)', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const gameUpdateValues = game.getGameUpdateValues();
+
+      expect(gameUpdateValues['recoverHunger']).toBe(game.recoverHunger);
+      expect(gameUpdateValues['loseHunger']).toBe(game.loseHunger);
+      expect(gameUpdateValues['recoverHappiness']).toBe(game.recoverHappiness);
+      expect(gameUpdateValues['loseHappiness']).toBe(game.loseHappiness);
+      expect(gameUpdateValues['clickMoney']).toBe(game.clickMoney);
+      expect(gameUpdateValues['idleMoney']).toBe(game.idleMoney);
+   });
+
+   it('retrieve game mission in progress (if exists)', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const gameMissionInProgress = game.getMissionInProgress();
+
+      expect(gameMissionInProgress).toBe(randomMission);
+   });
+
+   it('retrieve none if there not missions in progress', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const gameMissionInProgress = game.getMissionInProgress();
+
+      expect(gameMissionInProgress).toBe('none');
+   });
+
+   it('retrieve array with complete missions', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const missions = game.getCompleteMissions();
+
+      expect(missions).toStrictEqual([randomMission]);
+   });
+
+   it('retrieve empty array with missions if none complete', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      const missions = game.getCompleteMissions();
+
+      expect(missions).toStrictEqual([]);
+   });
+});

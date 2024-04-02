@@ -236,4 +236,50 @@ export default class Game {
             this.updateHunger(this.recoverHunger);
         }
     }
+
+    getGameData(): object {
+        return {
+            money: this.money,
+            happiness: this.happiness,
+            hunger: this.hunger,
+            missions: this.missions,
+            enhancements: this.enhancements,
+            recoverHunger: this.recoverHunger,
+            loseHunger: this.loseHunger,
+            recoverHappiness: this.recoverHappiness,
+            loseHappiness: this.loseHappiness,
+            clickMoney: this.clickMoney,
+            idleMoney: this.idleMoney,
+            missionProgress: this.missionProgress
+        }
+    }
+
+    getGameStats(): object {
+        return {
+            money: this.money,
+            happiness: this.happiness,
+            hunger: this.hunger
+        }
+    }
+
+    getGameUpdateValues(): object {
+        return {
+            recoverHunger: this.recoverHunger,
+            loseHunger: this.loseHunger,
+            recoverHappiness: this.recoverHappiness,
+            loseHappiness: this.loseHappiness,
+            clickMoney: this.clickMoney,
+            idleMoney: this.idleMoney,
+        }
+    }
+
+    getCompleteMissions(): Array<string> {
+        const completeMissions: Array<string> = [];
+        for (const mission in this.missions) {
+            if (this.missions.hasOwnProperty(mission) && this.missions[mission] === true) {
+                completeMissions.push(mission)
+            }
+        }
+        return completeMissions;
+    }
 }
