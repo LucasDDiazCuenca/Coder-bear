@@ -47,11 +47,11 @@ export const areAllNamesWritten = (array: any[]): boolean => {
     return true;
 }
 
-export const areMissionObjectiveValid = (): boolean => {
+export const areMissionGoalsValid = (): boolean => {
 
     for (const mission of MISSIONS) {
         ;
-        if (typeof mission.objective !== 'number' || mission.objective <= 0) {
+        if (typeof mission.goal !== 'number' || mission.goal <= 0) {
             return false;
         }
     }
