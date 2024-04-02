@@ -386,6 +386,48 @@ describe('Update Game idle-money', () => {
 
 });
 
+describe('Update Game mission-progress', () => {
+   afterEach(cleanup);
+
+   it('adds correct amount of progress', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 50, { [randomMission]: false }, [], 6, 0.8, 8, 0.1, 10, 12, 1);
+
+      game.updateMissionProgress(2);
+
+      expect(game.missionProgress).toBe(3);
+      expect(game.missions).toStrictEqual({ [randomMission]: false });
+   });
+
+   it('resets progress and completes mission when goal achieved', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 50, { [randomMission]: false }, [], 6, 0.8, 8, 0.1, 10, 12, 1);
+      const mission = MISSIONS.find(_mission => _mission.id === randomMission);
+
+      if (mission) game.updateMissionProgress(mission.goal);
+
+      expect(game.missionProgress).toBe(0);
+      expect(game.missions).toStrictEqual({ [randomMission]: true });
+   });
+
+   it('fails if value to add is <= 0', () => {
+      const game: Game = new Game();
+
+      expect(() => game.updateMissionProgress(-50)).toThrowError(
+         /^Invalid operation. Value is not valid.$/,
+      )
+   });
+
+   it('fails if there is no mission in progress', () => {
+      const game: Game = new Game();
+
+      expect(() => game.updateMissionProgress(5)).toThrowError(
+         /^Invalid operation. No mission in progress.$/,
+      )
+   });
+
+});
+
 describe('Update Game Missions', () => {
    afterEach(cleanup);
 
@@ -531,5 +573,100 @@ describe('Update Game Enhancements', () => {
       expect(() => game.updateEnhancements(randomEnhancement)).toThrowError(
          /^Invalid operation. Enhancement is already unlocked.$/,
       )
+   });
+});
+
+describe('Game On Click', () => {
+   afterEach(cleanup);
+
+   it('updates stats correctly after clicking with no mission active', () => {
+      const game: Game = new Game(10, 10, 50);
+
+      game.gameOnClick();
+
+      expect(game.hunger).toBe(50 - startingUpdateValues['lose-hunger']);
+      expect(game.happiness).toBe(10 - startingUpdateValues['lose-happiness']);
+      expect(game.money).toBe(10 + startingUpdateValues['click-money']);
+   });
+
+   it('updates stats correctly (half) if unhappy after clicking with no mission active', () => {
+      const game: Game = new Game(10, 0, 50);
+
+      game.gameOnClick();
+
+      expect(game.hunger).toBe(50 - startingUpdateValues['lose-hunger']);
+      expect(game.happiness).toBe(0);
+      expect(game.money).toBe(10 + (startingUpdateValues['click-money'] / 2));
+   });
+
+   it('updates stats correctly after clicking with a mission active', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 50, { [randomMission]: false });
+
+      const mission = MISSIONS.find(_mission => _mission.id === randomMission);
+      const goal: number = mission ? mission.goal : 0;
+
+      const expectedMissions: { [key: string]: boolean } = {};
+      expectedMissions[randomMission] = goal <= game.clickMoney;
+      const expectedMissionProgress: number = goal <= game.clickMoney ? 0 : game.clickMoney
+
+      game.gameOnClick();
+
+      expect(game.hunger).toBe(50 - game.loseHunger);
+      expect(game.happiness).toBe(10 - game.loseHappiness);
+      expect(game.missionProgress).toBe(expectedMissionProgress);
+      expect(game.missions).toStrictEqual(expectedMissions);
+   });
+
+   it('updates stats correctly (half) if unhappy after clicking with a mission active', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 0, 50, { [randomMission]: false });
+
+      const mission = MISSIONS.find(_mission => _mission.id === randomMission);
+      const goal: number = mission ? mission.goal : 0;
+
+      const expectedMissions: { [key: string]: boolean } = {};
+      expectedMissions[randomMission] = goal <= game.clickMoney / 2;
+      const expectedMissionProgress: number = goal <= game.clickMoney / 2 ? 0 : game.clickMoney / 2
+
+      game.gameOnClick();
+
+      expect(game.hunger).toBe(50 - game.loseHunger);
+      expect(game.happiness).toBe(0);
+      expect(game.missionProgress).toBe(expectedMissionProgress);
+      expect(game.missions).toStrictEqual(expectedMissions);
+   });
+
+   it('fails when trying to click with hunger === 0', () => {
+      const game: Game = new Game(90, 90, 0);
+
+      expect(() => game.gameOnClick()).toThrowError(
+         /^Invalid operation. Not available with hunger === 0.$/,
+      )
+   });
+});
+
+describe('Game On Idle', () => {
+   afterEach(cleanup);
+
+   it('updates stats correctly when idle with no mission active', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(10 + game.recoverHunger);
+      expect(game.happiness).toBe(10 + game.recoverHappiness);
+      expect(game.money).toBe(10 + game.idleMoney);
+   });
+
+   it('updates stats correctly when idle with a mission active', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(10, 10, 10, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(10 + game.recoverHunger);
+      expect(game.happiness).toBe(10 + game.recoverHappiness);
    });
 });

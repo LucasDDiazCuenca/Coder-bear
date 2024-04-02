@@ -135,6 +135,15 @@ export default class Game {
         this.idleMoney += value;
     }
 
+    getMissionInProgress(): string {
+        for (const mission in this.missions) {
+            if (this.missions.hasOwnProperty(mission) && this.missions[mission] === false) {
+                return mission;
+            }
+        }
+        return 'none';
+    }
+
     updateMissions(mission: string): void {
         if ((MISSIONS.map(({ id }) => id)).includes(mission) === false) throw new Error('Invalid operation. Mission does not exist.');
         if (Object.values(this.missions).some(complete => !complete) && this.missions[mission] === undefined) throw new Error('Invalid operation. Another mission is already active.');
@@ -162,7 +171,16 @@ export default class Game {
     updateMissionProgress(value: number): void {
         if (value <= 0) throw new Error('Invalid operation. Value is not valid.');
 
+        const missionId = this.getMissionInProgress();
+        const mission = MISSIONS.find(_mission => _mission.id === missionId);
+
+        if (!mission) throw new Error('Invalid operation. No mission in progress.');
+
         this.missionProgress += value;
+
+        if (mission.goal <= this.missionProgress) {
+            this.updateMissions(mission.id)
+        }
     }
 
     updateEnhancements(enhancement: string): void {
@@ -192,5 +210,30 @@ export default class Game {
         }
 
         this.enhancements.push(enhancement)
+    }
+
+    gameOnClick(): void {
+        if (this.hunger === 0) throw new Error('Invalid operation. Not available with hunger === 0.');
+        const updateOnClick = this.happiness === 0 ? this.clickMoney / 2 : this.clickMoney;
+        if (Object.values(this.missions).some(complete => !complete)) {
+            this.updateMissionProgress(updateOnClick);
+            this.updateHappiness(-this.loseHappiness);
+            this.updateHunger(-this.loseHunger);
+        } else {
+            this.updateMoney(updateOnClick);
+            this.updateHappiness(-this.loseHappiness);
+            this.updateHunger(-this.loseHunger)
+        }
+    }
+
+    gameOnIdle(): void {
+        if (Object.values(this.missions).some(complete => !complete)) {
+            this.updateHappiness(this.recoverHappiness);
+            this.updateHunger(this.recoverHunger);
+        } else {
+            this.updateMoney(this.idleMoney);
+            this.updateHappiness(this.recoverHappiness);
+            this.updateHunger(this.recoverHunger);
+        }
     }
 }
