@@ -1,7 +1,7 @@
 import { ENHANCEMENTS, MISSIONS } from '../../src/game/constants';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from "@testing-library/react";
-import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areIdsUnique, areMissionGoalsValid, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from './helpers';
+import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areEnhancementsIdsCorrect, areIdsUnique, areMissionGoalsValid, areMissionIdsCorrect, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from './helpers';
 
 describe('Game Constants', () => {
     afterEach(cleanup);
@@ -12,11 +12,24 @@ describe('Game Constants', () => {
         expect(areMissionsIdsUnique).toBe(true);
     });
 
+    it('all MISSIONS id are correct format (T || M || S + ###)', () => {
+        const areMissionsIdsGood = areMissionIdsCorrect();
+
+        expect(areMissionsIdsGood).toBe(true);
+    });
+
     it('all ENHANCEMENTS id are unique', () => {
         const areEnhancementsIdsUnique = areIdsUnique(ENHANCEMENTS);
 
         expect(areEnhancementsIdsUnique).toBe(true);
     });
+
+    it('all ENHANCEMENTS id are correct format (0 <= ### <= 999)', () => {
+        const areEnhancementsIdsGood = areEnhancementsIdsCorrect();
+
+        expect(areEnhancementsIdsGood).toBe(true);
+    });
+
 
     it('all MISSIONS have a description', () => {
         const areMissionsDescriptionWritten = areAllDescriptionsWritten(MISSIONS);

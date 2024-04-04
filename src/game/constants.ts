@@ -1,4 +1,3 @@
-/*TODO: Add documentation, check tests for guideline*/
 export const MISSIONS: { id: string, name: string, description: string, goal: number, reward: { type: string, value: number } }[] = [
     {
         id: "T001",

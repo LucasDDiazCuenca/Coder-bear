@@ -25,6 +25,38 @@ export const areIdsUnique = (array: any[]): boolean => {
     return true;
 }
 
+export const areMissionIdsCorrect = (): boolean => {
+    for (const obj of MISSIONS) {
+        const id = obj['id'];
+        const numberId = `${id[1] + id[2] + id[3]}`
+        if (id[0] !== 'T' && id[0] !== 'M' && id[0] !== 'S') {
+            return false;
+        }
+        if (typeof Number(numberId) !== 'number') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export const areEnhancementsIdsCorrect = (): boolean => {
+    for (const obj of ENHANCEMENTS) {
+        const id = obj['id'];
+        const numberId = Number(id)
+
+        if (typeof numberId !== 'number') {
+            return false;
+        }
+
+        if (numberId < 0 || numberId > 999) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export const areAllDescriptionsWritten = (array: any[]): boolean => {
     for (const obj of array) {
         const description = obj['description'];
