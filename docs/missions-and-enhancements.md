@@ -72,3 +72,14 @@ The effect is always a positive number that will be added to an update value, an
 - click-money
 - idle-money
 
+The complete add up of all this effects has to respect the "max-values" set in game constats:
+
+```js
+    {
+    'recover-hunger': 99.99,
+    'lose-hunger': 0.01,
+    'recover-happiness': 99.99,
+    'lose-happiness': 0.01,
+    }
+```
+
