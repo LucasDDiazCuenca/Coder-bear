@@ -66,6 +66,10 @@ Welcome to the Coder Bear development guidelines! These guidelines are designed 
 3. **Commit Size**:
     - Make small, focused commits corresponding to individual tasks or smaller changes.
 
+## Game Rules
+
+To know the basics of the games rules and how to add new assets, check [this](./docs/game-rules.md).
+
 ## Test Suite and Continuous Integration Pipeline
 
 This repository includes a pipeline designed to automate the testing and building process whenever changes are pushed to the repository. Read more about it [here](./docs/test-and-ci-pipeline.md).
