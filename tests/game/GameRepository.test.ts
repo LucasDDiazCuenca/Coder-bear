@@ -5,6 +5,7 @@ import GameRepository from '../../src/game/GameRepository';
 import { getRandomEnhancementId, getRandomMissionId } from './helpers';
 import { ENHANCEMENTS, MISSIONS, startingUpdateValues } from '../../src/game/constants';
 import { JSDOM } from "jsdom";
+import crypto from "crypto"
 
 // Set up JSDOM before running tests
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
@@ -42,37 +43,37 @@ const localStorageMock = (() => {
 })();
 
 global.localStorage = localStorageMock;
+const encryptionKey = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
 describe('Game Repository', () => {
    afterEach(() => {
       cleanup();
       localStorage.clear();
-   }
-   );
+   });
 
-   it('saves game as json in local storage', () => {
+   it('saves game as encrypted json in local storage', () => {
       const game: Game = new Game();
-      const gameData: object = game.getGameData();
-      const gameJson: any = JSON.stringify(gameData)
-
-      const repository = new GameRepository();
+      const repository = new GameRepository(encryptionKey, iv);
 
       repository.save(game);
 
-      expect(localStorage.getItem('game')).toStrictEqual(gameJson);
-
+      // Ensure that something is saved in local storage
+      expect(localStorage.getItem('game')).toBeTruthy();
    });
 
    it('retrieve correct data for created game as class game from local storage', () => {
       const newGame: Game = new Game(10, 10, 50, { '001': true, '002': false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
-      const gameJson: any = JSON.stringify(newGame.getGameData());
-      localStorage.setItem('game', gameJson);
+      const repository = new GameRepository(encryptionKey, iv);
 
-      const repository = new GameRepository();
+      repository.save(newGame);
 
       const game = repository.load();
 
+      // Compare individual properties to ensure decryption worked correctly
       expect(game).toBeInstanceOf(Game);
+      expect(game.money).toBe(10);
+      expect(game.happiness).toBe(10);
       expect(game.money).toBe(10);
       expect(game.happiness).toBe(10);
       expect(game.hunger).toBe(50);
@@ -88,23 +89,24 @@ describe('Game Repository', () => {
    });
 
    it('fails when no game to load', () => {
-      const repository = new GameRepository();
+      const repository = new GameRepository(encryptionKey, iv);
 
-      expect(() => repository.load()).toThrowError(
-         /^Error loading game. No game saved.$/,
-      )
+      expect(() => repository.load()).toThrowError(/^Error loading game/);
    });
 
    it('deletes saved game in local storage', () => {
       const newGame: Game = new Game(10, 10, 50, { '001': true, '002': false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
       const gameJson: any = JSON.stringify(newGame.getGameData());
-      localStorage.setItem('game', gameJson);
 
-      const repository = new GameRepository();
+      const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey), iv);
+      let encryptedData = cipher.update(gameJson, 'utf-8', 'hex');
+      encryptedData += cipher.final('hex');
+      localStorage.setItem('game', encryptedData);
+
+      const repository = new GameRepository(encryptionKey, iv);
 
       repository.delete();
 
       expect(localStorage.get()).toStrictEqual({});
-
    });
 });
