@@ -1,7 +1,14 @@
 import Game from "./Game";
 
+/**
+ * Represents a game repository instance that allows to save, load and delete the game.
+*/
 export default class GameRepository {
 
+    /**
+     * Saves a game instance as json to local storage.
+     * @param game The instance of Game class to save.
+    */
     save(game: Game): void {
         const gameData = game.getGameData();
         const jsonGame = JSON.stringify(gameData);
@@ -12,6 +19,10 @@ export default class GameRepository {
         }
     }
 
+    /**
+     * Loads a game saved to local storage.
+     * @returns An instance of Game class with the load game.
+    */
     load(): Game {
         try {
             const jsonGame: any = localStorage.getItem('game');
@@ -35,6 +46,9 @@ export default class GameRepository {
         }
     }
 
+    /**
+     * Deletes any saved game
+    */
     delete(): void {
         localStorage.clear();
     }
