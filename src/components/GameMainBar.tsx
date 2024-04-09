@@ -1,7 +1,7 @@
 import Game from "../game/Game";
 
-const GameMainBar = (props: { game: Game; }): React.ReactElement => {
-    const { game, } = props;
+const GameMainBar = (props: { game: Game; onWorkClick: Function; onMenuClick: Function }): React.ReactElement => {
+    const { game, onWorkClick, onMenuClick } = props;
 
 
     return (
@@ -11,12 +11,14 @@ const GameMainBar = (props: { game: Game; }): React.ReactElement => {
                 <p>Happy: {game.happiness}%</p>
                 <div className="flex flex-row gap-3 justify-center">
                     <button
-                        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-6 rounded w-fit"
+                        onClick={game?.hunger > 0 ? () => onWorkClick() : () => null}
+                        className={`${game?.hunger > 0 ? 'bg-blue-500 hover:bg-blue-400 text-white' : 'bg-blue-100 text-red-500 pointer-events-none'} font-bold py-2 px-6 w-fit`}
                     >
                         Work!
                     </button>
                     <button
-                        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-6 rounded w-fit"
+                        onClick={() => onMenuClick()}
+                        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-6  w-fit"
                     >
                         M&E
                     </button>
