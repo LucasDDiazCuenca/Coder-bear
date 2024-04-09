@@ -100,7 +100,7 @@ describe('Initialize Game', () => {
    });
 
    it('fails with incorrect recover-happiness value (<Start)', () => {
-      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, [], 1, 0.8, 1, 0.1, 8, 12)).toThrowError(
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, [], 4, 0.1, 0.01, 0.1, 50, 50, 0)).toThrowError(
          /^Invalid arguments. Argument 'recover-happiness' should be equal or higher than starting value.$/,
       )
    });
@@ -651,23 +651,56 @@ describe('Game On Idle', () => {
 
    it('updates stats correctly when idle with no mission active', () => {
       const randomMission: string = getRandomMissionId();
-      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+      const game: Game = new Game(50, 50, 50, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
 
       game.gameOnIdle();
 
-      expect(game.hunger).toBe(10 + game.recoverHunger);
-      expect(game.happiness).toBe(10 + game.recoverHappiness);
-      expect(game.money).toBe(10 + game.idleMoney);
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness);
+      expect(game.money).toBe(50 + game.idleMoney);
    });
 
    it('updates stats correctly when idle with a mission active', () => {
       const randomMission: string = getRandomMissionId();
-      const game: Game = new Game(10, 10, 10, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+      const game: Game = new Game(50, 50, 50, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
 
       game.gameOnIdle();
 
-      expect(game.hunger).toBe(10 + game.recoverHunger);
-      expect(game.happiness).toBe(10 + game.recoverHappiness);
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness);
+   });
+
+   it('does not update money if unhappy', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 0, 50, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(0 + game.recoverHappiness);
+      expect(game.money).toBe(50);
+   });
+
+   it('does not update money if hungry', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 50, 0, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(0 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness / 2);
+      expect(game.money).toBe(50);
+   });
+
+   it('it recovers happiness slower if too hungry', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 10, 5, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(5 + game.recoverHunger);
+      expect(game.happiness).toBe(10 + (game.recoverHappiness / 2));
+      expect(game.money).toBe(50 + game.idleMoney);
    });
 });
 

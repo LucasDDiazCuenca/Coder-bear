@@ -52,10 +52,10 @@ export const ENHANCEMENTS: { id: string, name: string, description: string, effe
 ];
 
 export const startingUpdateValues: { [key: string]: number } = {
-    'recover-hunger': 0.2,
+    'recover-hunger': 2,
     'lose-hunger': 2,
-    'recover-happiness': 5,
-    'lose-happiness': 2,
+    'recover-happiness': 0.5,
+    'lose-happiness': 5,
     'click-money': 2,
     'idle-money': 0,
 }

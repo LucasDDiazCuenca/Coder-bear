@@ -289,7 +289,7 @@ export default class Game {
     */
     gameOnClick(): void {
         if (this.hunger === 0) throw new Error('Invalid operation. Not available with hunger === 0.');
-        const updateOnClick = this.happiness === 0 ? this.clickMoney / 2 : this.clickMoney;
+        const updateOnClick = this.happiness <= 1 ? this.clickMoney / 2 : this.clickMoney;
         if (Object.values(this.missions).some(complete => !complete)) {
             this.updateMissionProgress(updateOnClick);
             this.updateHappiness(-this.loseHappiness);
@@ -305,12 +305,13 @@ export default class Game {
      * Applies all effects relative to idle in game depending of if there's a mission active.
     */
     gameOnIdle(): void {
+        const recoverHappinessSpeed = this.hunger > 20 ? this.recoverHappiness : this.recoverHappiness / 2
         if (Object.values(this.missions).some(complete => !complete)) {
-            this.updateHappiness(this.recoverHappiness);
             this.updateHunger(this.recoverHunger);
+            this.updateHappiness(recoverHappinessSpeed);
         } else {
-            this.updateMoney(this.idleMoney);
-            this.updateHappiness(this.recoverHappiness);
+            if (this.happiness > 1 && this.hunger > 1) this.updateMoney(this.idleMoney);
+            this.updateHappiness(recoverHappinessSpeed);
             this.updateHunger(this.recoverHunger);
         }
     }
