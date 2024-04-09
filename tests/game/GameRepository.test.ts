@@ -3,7 +3,7 @@ import { cleanup } from "@testing-library/react";
 import Game from '../../src/game/Game';
 import GameRepository from '../../src/game/GameRepository';
 import { JSDOM } from "jsdom";
-import localStorageMock from '../localStorageMock';
+import localStorageMock from '../helpers/localStorageMock';
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
 (global as any).document = jsdom.window.document;

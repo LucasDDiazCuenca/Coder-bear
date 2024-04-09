@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import Game from '../../src/game/Game';
-import { getRandomEnhancementId, getRandomMissionId } from './helpers';
+import { getRandomEnhancementId, getRandomMissionId } from '../helpers/helpers';
 import { ENHANCEMENTS, MISSIONS, startingUpdateValues } from '../../src/game/constants';
 
 describe('Initialize Game', () => {

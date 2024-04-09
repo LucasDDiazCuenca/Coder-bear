@@ -5,7 +5,7 @@ import useGame from '../../src/game/useGame';
 import { JSDOM } from 'jsdom';
 import Game from '../../src/game/Game';
 import { ENHANCEMENTS, MISSIONS } from '../../src/game/constants';
-import localStorageMock from '../localStorageMock';
+import localStorageMock from '../helpers/localStorageMock';
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
 (global as any).document = jsdom.window.document;

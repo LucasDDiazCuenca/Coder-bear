@@ -1,7 +1,7 @@
 import { ENHANCEMENTS, MISSIONS } from '../../src/game/constants';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from "@testing-library/react";
-import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areEnhancementsIdsCorrect, areIdsUnique, areMissionGoalsValid, areMissionIdsCorrect, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from './helpers';
+import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areEnhancementsIdsCorrect, areIdsUnique, areMissionGoalsValid, areMissionIdsCorrect, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from '../helpers/helpers';
 
 describe('Game Constants', () => {
     afterEach(cleanup);
