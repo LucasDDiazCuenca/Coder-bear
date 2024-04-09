@@ -4,9 +4,10 @@ import { Canvas } from "@react-three/fiber";
 import useGame from "./game/useGame";
 import GameTopBar from "./components/GameTopBar";
 import { useEffect, useState } from "react";
+import GameMainBar from "./components/GameMainBar";
 
 const App = (): React.ReactElement => {
-	const { game, missionsList, enhancementsList, saveGame } = useGame();
+	const { game, missionsList, /*enhancementsList, saveGame*/ } = useGame();
 	const [missionsActivated, setMissionsActivated] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -23,7 +24,7 @@ const App = (): React.ReactElement => {
 		<>
 			<div className="w-screen h-screen text-center text-3xl">
 				{game && <GameTopBar game={game} isMissionActive={missionsActivated} missions={missionsList} />}
-				<div className="h-5/6">
+				<div className="h-4/6">
 					<Canvas
 						dpr={[1, 2]}
 						shadows
@@ -39,7 +40,7 @@ const App = (): React.ReactElement => {
 						<ScenarioExperience />
 					</Canvas>
 				</div>
-				<HelloWorld />
+				{game && <GameMainBar game={game} />}
 			</div>
 		</>
 	);
