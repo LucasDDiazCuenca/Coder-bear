@@ -11,7 +11,7 @@ export default class GameRepository {
     save(game: Game): void {
         const gameData = game.getGameData();
         const encodedData = btoa(JSON.stringify(gameData));
-        localStorage.setItem('game', JSON.stringify(encodedData));
+        localStorage.setItem('game', encodedData);
     }
 
     /**

@@ -26,6 +26,7 @@ const useGame = () => {
      */
     const saveGame = () => {
         if (game) {
+            gameRepository.delete();
             gameRepository.save(game);
         }
     };
@@ -46,24 +47,19 @@ const useGame = () => {
         try {
             const loadedGame = gameRepository.load();
             setGame(loadedGame);
-        } catch {
+        } catch (error) {
             const newGame = new Game(); // Initialize a new game if loading fails
             setGame(newGame);
         }
     }, []);
 
-    /**
-     * Effect to save the game state whenever it changes.
-     * This ensures that the game state is persisted to the repository.
-     */
-    useEffect(() => {
-        saveGame();
-    }, [game]);
+    useEffect(() => saveGame(), [game])
 
     // Return game and operations
     return {
         game, // Current game instance of Game
         deleteGame, // Function to delete the game
+        saveGame,
         missionsList, // List of missions available in the game
         enhancementsList // List of enhancements available in the game
     };
