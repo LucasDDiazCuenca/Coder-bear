@@ -1,7 +1,7 @@
 import { ENHANCEMENTS, MISSIONS } from '../../src/game/constants';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from "@testing-library/react";
-import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areEnhancementsIdsCorrect, areIdsUnique, areMissionGoalsValid, areMissionIdsCorrect, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from '../helpers/helpers';
+import { areAllDescriptionsWritten, areAllNamesWritten, areEnhancementsEffectSumValuesValid, areEnhancementsEffectTypeValid, areEnhancementsIdsCorrect, areEnhancementsPriceValid, areIdsUnique, areMissionGoalsValid, areMissionIdsCorrect, areMissionRewardsTypeValid, areMissionRewardsValueTypeValid } from '../helpers/helpers';
 
 describe('Game Constants', () => {
     afterEach(cleanup);
@@ -55,18 +55,6 @@ describe('Game Constants', () => {
         expect(areEnhancementsNameWritten).toBe(true);
     });
 
-    it('all MISSIONS have a name', () => {
-        const areMissionsNameWritten = areAllNamesWritten(MISSIONS);
-
-        expect(areMissionsNameWritten).toBe(true);
-    });
-
-    it('all ENHANCEMENTS have a name', () => {
-        const areEnhancementsNameWritten = areAllNamesWritten(ENHANCEMENTS);
-
-        expect(areEnhancementsNameWritten).toBe(true);
-    });
-
     it('all MISSIONS have a valid goals', () => {
         const areMissionGoalsValids = areMissionGoalsValid();
 
@@ -95,6 +83,12 @@ describe('Game Constants', () => {
         const areEnhancementEffectsValueValid = areEnhancementsEffectTypeValid();
 
         expect(areEnhancementEffectsValueValid).toBe(true);
+    });
+
+    it('all ENHANCEMENTS have a valid price', () => {
+        const areEnhancementPricesValid = areEnhancementsPriceValid();
+
+        expect(areEnhancementPricesValid).toBe(true);
     });
 
     it('total of ENHANCEMENTS that modify recover-hunger sum up a valid value', () => {

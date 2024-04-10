@@ -258,6 +258,10 @@ export default class Game {
     updateEnhancements(enhancement: string): void {
         if ((ENHANCEMENTS.map(({ id }) => id)).includes(enhancement) === false) throw new Error('Invalid operation. Enhancement does not exist.');
         if (this.enhancements.includes(enhancement)) throw new Error('Invalid operation. Enhancement is already unlocked.');
+        const price = ENHANCEMENTS.find(_enhancement => _enhancement.id === enhancement)?.price
+        if (price && price > this.money) throw new Error('Invalid operation. Enhancement is too expensive.');
+
+        if (price) this.money -= price;
 
         const effect: any = ENHANCEMENTS.find(_enhancement => _enhancement.id === enhancement)?.effect;
         switch (effect.type) {

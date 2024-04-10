@@ -543,8 +543,9 @@ describe('Update Game Enhancements', () => {
 
    it('adds correct new enhancement in progress to enhancement array and updates its effect', () => {
       const randomEnhancement: string = getRandomEnhancementId();
-      const game: Game = new Game(90, 90, 50, {}, []);
+      const game: Game = new Game(500000000000, 90, 50, {}, []);
       const effect: any = ENHANCEMENTS.find(enhancement => enhancement.id === randomEnhancement)?.effect;
+      const price: any = ENHANCEMENTS.find(enhancement => enhancement.id === randomEnhancement)?.price;
 
       const recoverHunger = effect.type === 'recover-hunger' ? game.recoverHunger + effect.value : game.recoverHunger;
       const loseHunger = effect.type === 'lose-hunger' ? game.loseHunger - effect.value : game.loseHunger;
@@ -557,6 +558,7 @@ describe('Update Game Enhancements', () => {
 
       const expectedEnhancements: Array<String> = [randomEnhancement];
 
+      expect(game.money).toBe(500000000000 - price);
       expect(game.enhancements).toStrictEqual(expectedEnhancements);
       expect(game.recoverHunger).toBe(recoverHunger);
       expect(game.loseHunger).toBe(loseHunger);
@@ -572,6 +574,23 @@ describe('Update Game Enhancements', () => {
 
       expect(() => game.updateEnhancements(randomEnhancement)).toThrowError(
          /^Invalid operation. Enhancement is already unlocked.$/,
+      )
+   });
+
+   it('fails on not existent enhancement', () => {
+      const game: Game = new Game(90, 90, 50, {});
+
+      expect(() => game.updateEnhancements('IDONTEXIST')).toThrowError(
+         /^Invalid operation. Enhancement does not exist.$/,
+      )
+   });
+
+   it('fails on money not enough for the enhancement', () => {
+      const randomEnhancement: string = getRandomEnhancementId();
+      const game: Game = new Game(0, 90, 50, {});
+
+      expect(() => game.updateEnhancements(randomEnhancement)).toThrowError(
+         /^Invalid operation. Enhancement is too expensive.$/,
       )
    });
 });

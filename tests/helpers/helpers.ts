@@ -117,6 +117,18 @@ export const areEnhancementsEffectTypeValid = (): boolean => {
     return true;
 }
 
+export const areEnhancementsPriceValid = (): boolean => {
+
+    for (const enhancement of ENHANCEMENTS) {
+        ;
+        if (typeof enhancement.price !== 'number' || enhancement.price <= 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export const areMissionRewardsValueTypeValid = (): boolean => {
     for (const mission of MISSIONS) {
         const reward = mission['reward'].value;

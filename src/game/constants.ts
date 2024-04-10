@@ -21,11 +21,12 @@ export const MISSIONS: { id: string, name: string, description: string, goal: nu
     },
 ];
 
-export const ENHANCEMENTS: { id: string, name: string, description: string, effect: { type: string, value: number } }[] = [
+export const ENHANCEMENTS: { id: string, name: string, description: string, price: number, effect: { type: string, value: number } }[] = [
     {
         id: "001",
         name: "Microwave",
         description: "Cooking is easier and faster if you don't really cook at all.",
+        price: 20,
         effect: {
             type: "lose-hunger",
             value: 0.2
@@ -35,6 +36,7 @@ export const ENHANCEMENTS: { id: string, name: string, description: string, effe
         id: "002",
         name: "Nice plant",
         description: "Looking at it fills you with joy (and determination).",
+        price: 5,
         effect: {
             type: "recover-happiness",
             value: 2
@@ -44,6 +46,7 @@ export const ENHANCEMENTS: { id: string, name: string, description: string, effe
         id: "003",
         name: "New Computer",
         description: "Work better, earn more",
+        price: 100,
         effect: {
             type: "idle-money",
             value: 5
