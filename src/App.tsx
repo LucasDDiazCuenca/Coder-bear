@@ -5,9 +5,10 @@ import GameTopBar from "./components/GameTopBar";
 import { useEffect, useState } from "react";
 import GameMainBar from "./components/GameMainBar";
 import MissionsMenu from "./components/MissionsMenu";
+import EnhancementsMenu from "./components/EnhancementsMenu";
 
 const App = (): React.ReactElement => {
-	const { game, missionsList, saveGame /*enhancementsList*/ } = useGame();
+	const { game, missionsList, saveGame, enhancementsList } = useGame();
 	const [missionActivated, setMissionActivated] = useState<boolean>(false);
 	const [clicksCounter, setClicksCounter] = useState(0);
 	const [secondsPassed, setSecondsPassed] = useState(0);
@@ -46,7 +47,7 @@ const App = (): React.ReactElement => {
 	useEffect(() => {
 		if (secondsPassed % 1 === 0) {
 			game?.gameOnIdle();
-			saveGame();
+			//saveGame();
 		}
 	}, [secondsPassed]);
 
@@ -58,17 +59,11 @@ const App = (): React.ReactElement => {
 		saveGame();
 	}
 
-	const handleToMissionsClick = (): void => {
-		setView('missions')
-	}
+	const handleToMissionsClick = (): void => setView('missions');
 
-	const handleToEnhancementsClick = (): void => {
-		setView('enhance')
-	}
+	const handleToEnhancementsClick = (): void => setView('enhance');
 
-	const handleToMainClick = (): void => {
-		setView('main')
-	}
+	const handleToMainClick = (): void => setView('main');
 
 	return (
 		<>
@@ -97,7 +92,9 @@ const App = (): React.ReactElement => {
 			{
 				(game && view === 'missions') && <MissionsMenu game={game} isMissionActive={missionActivated} missions={missionsList} onClose={handleToMainClick} onEnhancements={handleToEnhancementsClick} onActivateMission={handleActivateMissions} />
 			}
-
+			{
+				(game && view === 'enhance') && <EnhancementsMenu game={game} enhancements={enhancementsList} onClose={handleToMainClick} onMissions={handleToMissionsClick} save={saveGame} />
+			}
 		</>
 	);
 };
