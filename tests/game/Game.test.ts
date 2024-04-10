@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import Game from '../../src/game/Game';
-import { getRandomEnhancementId, getRandomMissionId } from './helpers';
+import { getRandomEnhancementId, getRandomMissionId } from '../helpers/helpers';
 import { ENHANCEMENTS, MISSIONS, startingUpdateValues } from '../../src/game/constants';
 
 describe('Initialize Game', () => {
@@ -100,7 +100,7 @@ describe('Initialize Game', () => {
    });
 
    it('fails with incorrect recover-happiness value (<Start)', () => {
-      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, [], 1, 0.8, 1, 0.1, 8, 12)).toThrowError(
+      expect(() => new Game(10, 10, 50, { '001': true, '002': false }, [], 4, 0.1, 0.01, 0.1, 50, 50, 0)).toThrowError(
          /^Invalid arguments. Argument 'recover-happiness' should be equal or higher than starting value.$/,
       )
    });
@@ -543,8 +543,9 @@ describe('Update Game Enhancements', () => {
 
    it('adds correct new enhancement in progress to enhancement array and updates its effect', () => {
       const randomEnhancement: string = getRandomEnhancementId();
-      const game: Game = new Game(90, 90, 50, {}, []);
+      const game: Game = new Game(500000000000, 90, 50, {}, []);
       const effect: any = ENHANCEMENTS.find(enhancement => enhancement.id === randomEnhancement)?.effect;
+      const price: any = ENHANCEMENTS.find(enhancement => enhancement.id === randomEnhancement)?.price;
 
       const recoverHunger = effect.type === 'recover-hunger' ? game.recoverHunger + effect.value : game.recoverHunger;
       const loseHunger = effect.type === 'lose-hunger' ? game.loseHunger - effect.value : game.loseHunger;
@@ -557,6 +558,7 @@ describe('Update Game Enhancements', () => {
 
       const expectedEnhancements: Array<String> = [randomEnhancement];
 
+      expect(game.money).toBe(500000000000 - price);
       expect(game.enhancements).toStrictEqual(expectedEnhancements);
       expect(game.recoverHunger).toBe(recoverHunger);
       expect(game.loseHunger).toBe(loseHunger);
@@ -572,6 +574,23 @@ describe('Update Game Enhancements', () => {
 
       expect(() => game.updateEnhancements(randomEnhancement)).toThrowError(
          /^Invalid operation. Enhancement is already unlocked.$/,
+      )
+   });
+
+   it('fails on not existent enhancement', () => {
+      const game: Game = new Game(90, 90, 50, {});
+
+      expect(() => game.updateEnhancements('IDONTEXIST')).toThrowError(
+         /^Invalid operation. Enhancement does not exist.$/,
+      )
+   });
+
+   it('fails on money not enough for the enhancement', () => {
+      const randomEnhancement: string = getRandomEnhancementId();
+      const game: Game = new Game(0, 90, 50, {});
+
+      expect(() => game.updateEnhancements(randomEnhancement)).toThrowError(
+         /^Invalid operation. Enhancement is too expensive.$/,
       )
    });
 });
@@ -651,23 +670,56 @@ describe('Game On Idle', () => {
 
    it('updates stats correctly when idle with no mission active', () => {
       const randomMission: string = getRandomMissionId();
-      const game: Game = new Game(10, 10, 10, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+      const game: Game = new Game(50, 50, 50, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
 
       game.gameOnIdle();
 
-      expect(game.hunger).toBe(10 + game.recoverHunger);
-      expect(game.happiness).toBe(10 + game.recoverHappiness);
-      expect(game.money).toBe(10 + game.idleMoney);
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness);
+      expect(game.money).toBe(50 + game.idleMoney);
    });
 
    it('updates stats correctly when idle with a mission active', () => {
       const randomMission: string = getRandomMissionId();
-      const game: Game = new Game(10, 10, 10, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+      const game: Game = new Game(50, 50, 50, { [randomMission]: false }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
 
       game.gameOnIdle();
 
-      expect(game.hunger).toBe(10 + game.recoverHunger);
-      expect(game.happiness).toBe(10 + game.recoverHappiness);
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness);
+   });
+
+   it('does not update money if unhappy', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 0, 50, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(50 + game.recoverHunger);
+      expect(game.happiness).toBe(0 + game.recoverHappiness);
+      expect(game.money).toBe(50);
+   });
+
+   it('does not update money if hungry', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 50, 0, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(0 + game.recoverHunger);
+      expect(game.happiness).toBe(50 + game.recoverHappiness / 2);
+      expect(game.money).toBe(50);
+   });
+
+   it('it recovers happiness slower if too hungry', () => {
+      const randomMission: string = getRandomMissionId();
+      const game: Game = new Game(50, 10, 5, { [randomMission]: true }, ['001'], 6, 0.8, 10, 0.1, 8, 12, 15);
+
+      game.gameOnIdle();
+
+      expect(game.hunger).toBe(5 + game.recoverHunger);
+      expect(game.happiness).toBe(10 + (game.recoverHappiness / 2));
+      expect(game.money).toBe(50 + game.idleMoney);
    });
 });
 
